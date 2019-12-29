@@ -4,8 +4,8 @@ import { Ship } from "./ship.entity";
 import { Repository } from "typeorm";
 import { ShipLength } from "./models/ShipLength";
 import { Orientation } from "./models/Orientation";
-import { ShipType } from "src/games/models/ShipType";
-import { getRandomNumber } from "src/utils/getRandomNumber";
+import { ShipType } from "./models/ShipType";
+import { getRandomNumber } from "../utils/getRandomNumber";
 
 @Injectable()
 export class ShipsService {
@@ -93,12 +93,12 @@ export class ShipsService {
 	public getShipCords(ship: Ship): number[] {
 		const length = ShipLength[ship.type];
 
-		return Array.from({ length }, (v, i) => {
-			return (
-				ship.start +
-				i +
-				(ship.orientation === Orientation.Horizontal ? 0 : 10 - i)
-			);
+		return Array.from({ length }, (_, i) => {
+			if (ship.orientation === Orientation.Horizontal) {
+				return ship.start + i;
+			}
+
+			return ship.start + 10 * i;
 		});
 	}
 

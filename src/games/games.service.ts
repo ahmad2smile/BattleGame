@@ -3,7 +3,7 @@ import { PlayerRole } from "./models/PlayerRole";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { ShipsService } from "src/ships/ships.service";
+import { ShipsService } from "../ships/ships.service";
 
 @Injectable()
 export class GamesService {

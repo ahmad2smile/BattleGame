@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { Game } from "../games/game.entity";
 import { Orientation } from "./models/Orientation";
-import { ShipType } from "src/games/models/ShipType";
+import { ShipType } from "../ships/models/ShipType";
 
 @Entity({ name: "ships" })
 export class Ship {
