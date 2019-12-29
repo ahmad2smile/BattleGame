@@ -15,7 +15,7 @@ export class GamesService {
 
 	find(id: string): Promise<Game> {
 		return this._gameRepository.findOne(id, {
-			relations: ["ships"],
+			relations: ["ships", "attacks"],
 		});
 	}
 

@@ -1,7 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	ManyToOne,
+	OneToMany,
+} from "typeorm";
 import { Game } from "../games/game.entity";
 import { Orientation } from "./models/Orientation";
 import { ShipType } from "../ships/models/ShipType";
+import { Attack } from "../attacks/attack.entity";
 
 @Entity({ name: "ships" })
 export class Ship {
@@ -36,4 +43,11 @@ export class Ship {
 		game => game.ships,
 	)
 	game: Game;
+
+	@OneToMany(
+		type => Attack,
+		attack => attack.hitShip,
+		{ cascade: true },
+	)
+	attacks: Attack[];
 }

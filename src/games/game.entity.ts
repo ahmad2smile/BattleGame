@@ -1,3 +1,4 @@
+import { Attack } from "./../attacks/attack.entity";
 import { Ship } from "./../ships/ship.entity";
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { PlayerRole } from "./models/PlayerRole";
@@ -20,4 +21,11 @@ export class Game {
 		{ cascade: true },
 	)
 	ships: Ship[];
+
+	@OneToMany(
+		type => Attack,
+		ship => ship.game,
+		{ cascade: true },
+	)
+	attacks: Attack[];
 }
