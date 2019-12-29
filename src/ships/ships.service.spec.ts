@@ -5,6 +5,7 @@ import { ShipsService } from "./ships.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { ShipType } from "./models/ShipType";
 import { Orientation } from "./models/Orientation";
+import { MaxShips } from "./models/MaxShips";
 
 describe("ShipsService", () => {
 	let service: ShipsService;
@@ -90,25 +91,25 @@ describe("ShipsService", () => {
 		it("Should have total 1 Battleship", () => {
 			expect(
 				randomShips.filter(s => s.type === ShipType.Battleship).length,
-			).toBe(1);
+			).toBe(MaxShips.Battleship);
 		});
 
 		it("Should have total 2 Cruiser", () => {
 			expect(
 				randomShips.filter(s => s.type === ShipType.Cruiser).length,
-			).toBe(2);
+			).toBe(MaxShips.Cruiser);
 		});
 
 		it("Should have total 3 Destroyer", () => {
 			expect(
 				randomShips.filter(s => s.type === ShipType.Destroyer).length,
-			).toBe(3);
+			).toBe(MaxShips.Destroyer);
 		});
 
 		it("Should have total 4 Submarine", () => {
 			expect(
 				randomShips.filter(s => s.type === ShipType.Submarine).length,
-			).toBe(4);
+			).toBe(MaxShips.Submarine);
 		});
 
 		it("Should not have any ship start at 0", () => {

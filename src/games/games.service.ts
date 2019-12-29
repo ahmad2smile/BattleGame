@@ -54,12 +54,14 @@ export class GamesService {
 		ship.type = shipDto.type;
 		ship.orientation = shipDto.orientation;
 		ship.start = shipDto.start;
-		ship.end = this._shipsService.getShipCords(ship).pop();
-		ship.damage = 0;
-		ship.attacks = null;
 		ship.game = game;
 
-		game.ships.push(ship);
+		const placedShip = this._shipsService.placeDefenderShip(
+			ship,
+			game.ships,
+		);
+
+		game.ships.push(placedShip);
 
 		return this.update(game);
 	}

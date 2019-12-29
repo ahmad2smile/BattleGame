@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+	Injectable,
+	NotFoundException,
+	BadRequestException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Ship } from "./ship.entity";
 import { Repository } from "typeorm";
@@ -6,6 +10,7 @@ import { ShipLength } from "./models/ShipLength";
 import { Orientation } from "./models/Orientation";
 import { ShipType } from "./models/ShipType";
 import { getRandomNumber } from "../utils/getRandomNumber";
+import { MaxShips } from "./models/MaxShips";
 
 @Injectable()
 export class ShipsService {
@@ -57,6 +62,42 @@ export class ShipsService {
 		]);
 	}
 
+	getShipCords(ship: Ship): number[] {
+		const length = ShipLength[ship.type];
+
+		return Array.from({ length }, (_, i) => {
+			if (ship.orientation === Orientation.Horizontal) {
+				return ship.start + i;
+			}
+
+			return ship.start + 10 * i;
+		});
+	}
+
+	placeDefenderShip(ship: Ship, gameShips: Ship[]): Ship {
+		const shipCords = this.getShipCords(ship);
+
+		const existingShips = gameShips.filter(s => s.type === ship.type);
+
+		if (existingShips.length === MaxShips[ship.type]) {
+			throw new BadRequestException(
+				`Game can only have ${MaxShips[ship.type]} ${ship.type}`,
+			);
+		}
+
+		if (!this.isValidPosition(gameShips, -1, shipCords)) {
+			throw new BadRequestException(
+				`Invalid start position for ${ship.type}`,
+			);
+		}
+
+		ship.end = shipCords.pop();
+		ship.damage = 0;
+		ship.attacks = [];
+
+		return ship;
+	}
+
 	private placeRandomShips(ships: Ship[]): Ship[] {
 		for (let i = 0; i < ships.length; i++) {
 			const ship = ships[i];
@@ -94,18 +135,6 @@ export class ShipsService {
 					),
 				) && shipCords.every(c => c > 0 && c < 101)
 		);
-	}
-
-	public getShipCords(ship: Ship): number[] {
-		const length = ShipLength[ship.type];
-
-		return Array.from({ length }, (_, i) => {
-			if (ship.orientation === Orientation.Horizontal) {
-				return ship.start + i;
-			}
-
-			return ship.start + 10 * i;
-		});
 	}
 
 	private getSafeCordsAroundShip(ship: Ship): number[] {
