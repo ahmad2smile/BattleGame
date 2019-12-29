@@ -13,7 +13,7 @@ import { Game } from "../games/game.entity";
 import { AttackCreateDTO } from "./models/AttackCreateDTO";
 import { AttackDTO } from "./models/AttackDTO";
 import { AttackResult } from "./models/AttackResult";
-import { Orientation } from "src/ships/models/Orientation";
+import { Orientation } from "../ships/models/Orientation";
 
 @Injectable()
 export class AttacksService {
@@ -94,7 +94,7 @@ export class AttacksService {
 			shipLength = (ship.end - ship.start) / 10 + 1; // Include end side too
 		}
 
-		ship.damage += Math.ceil(100 / shipLength);
+		ship.damage = (ship.damage || 0) + Math.ceil(100 / shipLength);
 
 		return ship;
 	}

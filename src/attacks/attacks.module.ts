@@ -4,7 +4,7 @@ import { Module } from "@nestjs/common";
 import { AttacksService } from "./attacks.service";
 import { AttacksController } from "./attacks.controller";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { GamesModule } from "src/games/games.module";
+import { GamesModule } from "../games/games.module";
 
 @Module({
 	imports: [TypeOrmModule.forFeature([Attack]), GamesModule, ShipsModule],

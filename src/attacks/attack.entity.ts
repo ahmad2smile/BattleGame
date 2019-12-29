@@ -1,6 +1,6 @@
 import { Ship } from "./../ships/ship.entity";
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import { Game } from "src/games/game.entity";
+import { Game } from "../games/game.entity";
 import { AttackResult } from "./models/AttackResult";
 
 @Entity({ name: "attacks" })
