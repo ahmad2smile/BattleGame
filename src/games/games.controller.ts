@@ -1,4 +1,4 @@
-import { Game } from "./game.entity";
+import { ShipDTO } from "./../ships/models/ShipDTO";
 import { GamesService } from "./games.service";
 import { GameCreateDTO } from "./models/GameCreateDTO";
 import { Body, Controller, Get, Post, Query } from "@nestjs/common";
@@ -16,6 +16,13 @@ export class GamesController {
 	@Post()
 	async createNewGame(@Body() gameDto: GameCreateDTO): Promise<GameState> {
 		const game = await this._gamesService.add(gameDto.playerRole);
+
+		return new GameState(game);
+	}
+
+	@Post("/place-ship")
+	async placeShip(@Body() shipDto: ShipDTO): Promise<GameState> {
+		const game = await this._gamesService.addShip(shipDto);
 
 		return new GameState(game);
 	}

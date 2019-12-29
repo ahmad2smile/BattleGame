@@ -14,6 +14,7 @@ import { AttackCreateDTO } from "./models/AttackCreateDTO";
 import { AttackDTO } from "./models/AttackDTO";
 import { AttackResult } from "./models/AttackResult";
 import { Orientation } from "../ships/models/Orientation";
+import { PlayerRole } from "../games/models/PlayerRole";
 
 @Injectable()
 export class AttacksService {
@@ -39,6 +40,12 @@ export class AttacksService {
 		attack.position = attackDto.position;
 
 		const game = await this._gamesService.find(attackDto.gameId);
+
+		if (game.playerRole === PlayerRole.Defender) {
+			throw new BadRequestException(
+				"Can not attack on Defender Role Game!",
+			);
+		}
 
 		if (game.ships.every(s => s.damage >= 99)) {
 			throw new BadRequestException("Game is over!");

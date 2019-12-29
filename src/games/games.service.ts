@@ -1,3 +1,5 @@
+import { Ship } from "./../ships/ship.entity";
+import { ShipDTO } from "./../ships/models/ShipDTO";
 import { Game } from "./game.entity";
 import { PlayerRole } from "./models/PlayerRole";
 import { Injectable, NotFoundException } from "@nestjs/common";
@@ -37,12 +39,29 @@ export class GamesService {
 		game.playerRole = playerRole;
 
 		if (playerRole === PlayerRole.Defender) {
-			game.ships = null;
+			game.ships = [];
 		} else {
 			game.ships = this._shipsService.getRandomShips();
 		}
 
 		return this._gameRepository.save(game);
+	}
+
+	async addShip(shipDto: ShipDTO): Promise<Game> {
+		const game = await this.find(shipDto.gameId);
+
+		const ship = new Ship();
+		ship.type = shipDto.type;
+		ship.orientation = shipDto.orientation;
+		ship.start = shipDto.start;
+		ship.end = this._shipsService.getShipCords(ship).pop();
+		ship.damage = 0;
+		ship.attacks = null;
+		ship.game = game;
+
+		game.ships.push(ship);
+
+		return this.update(game);
 	}
 
 	update(game: Game): Promise<Game> {
