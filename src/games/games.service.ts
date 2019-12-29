@@ -2,7 +2,11 @@ import { Ship } from "./../ships/ship.entity";
 import { ShipDTO } from "./../ships/models/ShipDTO";
 import { Game } from "./game.entity";
 import { PlayerRole } from "./models/PlayerRole";
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+	Injectable,
+	NotFoundException,
+	BadRequestException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ShipsService } from "../ships/ships.service";
@@ -49,6 +53,12 @@ export class GamesService {
 
 	async addShip(shipDto: ShipDTO): Promise<Game> {
 		const game = await this.find(shipDto.gameId);
+
+		if (game.playerRole === PlayerRole.Attacker) {
+			throw new BadRequestException(
+				"Can not place ship on a Attacker Role Game",
+			);
+		}
 
 		const ship = new Ship();
 		ship.type = shipDto.type;
