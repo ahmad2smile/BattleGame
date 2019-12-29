@@ -41,9 +41,9 @@ export class AttacksService {
 
 		const game = await this._gamesService.find(attackDto.gameId);
 
-		if (game.playerRole === PlayerRole.Defender) {
+		if (game.ships.length !== 10) {
 			throw new BadRequestException(
-				"Can not attack on Defender Role Game!",
+				"Please wait, Defender is placing ships",
 			);
 		}
 
