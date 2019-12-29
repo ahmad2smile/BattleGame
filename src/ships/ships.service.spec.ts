@@ -6,6 +6,7 @@ import { getRepositoryToken } from "@nestjs/typeorm";
 import { ShipType } from "./models/ShipType";
 import { Orientation } from "./models/Orientation";
 import { MaxShips } from "./models/MaxShips";
+import { BadRequestException } from "@nestjs/common";
 
 describe("ShipsService", () => {
 	let service: ShipsService;
@@ -118,6 +119,39 @@ describe("ShipsService", () => {
 
 		it("Should not have any ship end after 100", () => {
 			expect(randomShips.every(s => s.end < 101)).toBe(true);
+		});
+	});
+
+	describe("Place Defender Ships", () => {
+		it("Should place Battleship", () => {
+			const placedShip = service.placeDefenderShip(ship, []);
+			expect(placedShip.type).toBe(ShipType.Battleship);
+		});
+
+		it("Should throw Game can only have 1 Battleship", () => {
+			const placeShip = () => service.placeDefenderShip(ship, [ship]);
+
+			expect(placeShip).toThrow(BadRequestException);
+		});
+
+		it("Should throw invalid Position exception for ship", () => {
+			const submarine = { ...ship };
+			submarine.type = ShipType.Submarine;
+
+			const placeShip = () =>
+				service.placeDefenderShip(submarine, [ship]);
+
+			expect(placeShip).toThrow(BadRequestException);
+		});
+
+		it("Should place submarine", () => {
+			const submarine = { ...ship };
+			submarine.type = ShipType.Submarine;
+			submarine.start = 32;
+
+			const placedShip = service.placeDefenderShip(submarine, []);
+
+			expect(placedShip.type).toBe(ShipType.Submarine);
 		});
 	});
 });
