@@ -4,8 +4,8 @@ import { GamesService } from "./../games/games.service";
 import { Attack } from "./attack.entity";
 import {
 	Injectable,
-	NotFoundException,
 	BadRequestException,
+	NotFoundException,
 } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -24,8 +24,14 @@ export class AttacksService {
 		private readonly _shipsService: ShipsService,
 	) {}
 
-	find(id: number): Promise<Attack> {
-		return this._attackRepository.findOne(id);
+	async find(id: number): Promise<Attack> {
+		const attack = await this._attackRepository.findOne(id);
+
+		if (!attack) {
+			throw new NotFoundException("Attack not found");
+		}
+
+		return attack;
 	}
 
 	async add(attackDto: AttackCreateDTO): Promise<AttackDTO> {
@@ -33,10 +39,6 @@ export class AttacksService {
 		attack.position = attackDto.position;
 
 		const game = await this._gamesService.find(attackDto.gameId);
-
-		if (!game) {
-			throw new NotFoundException("Game not found");
-		}
 
 		if (game.ships.every(s => s.damage >= 99)) {
 			throw new BadRequestException("Game is over!");

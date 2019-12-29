@@ -1,9 +1,10 @@
 import { Game } from "./game.entity";
 import { PlayerRole } from "./models/PlayerRole";
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ShipsService } from "../ships/ships.service";
+import { GameState } from "./models/GameState";
 
 @Injectable()
 export class GamesService {
@@ -13,10 +14,22 @@ export class GamesService {
 		private readonly _shipsService: ShipsService,
 	) {}
 
-	find(id: string): Promise<Game> {
-		return this._gameRepository.findOne(id, {
+	async find(id: string): Promise<Game> {
+		const game = await this._gameRepository.findOne(id, {
 			relations: ["ships", "attacks"],
 		});
+
+		if (!game) {
+			throw new NotFoundException("Game not found");
+		}
+
+		return game;
+	}
+
+	async state(id: string): Promise<GameState> {
+		const game = await this.find(id);
+
+		return new GameState(game);
 	}
 
 	add(playerRole: PlayerRole): Promise<Game> {

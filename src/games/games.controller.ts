@@ -9,8 +9,8 @@ export class GamesController {
 	constructor(private readonly _gamesService: GamesService) {}
 
 	@Get()
-	get(@Query() id: string): Promise<Game> {
-		return this._gamesService.find(id);
+	get(@Query() id: string): Promise<GameState> {
+		return this._gamesService.state(id);
 	}
 
 	@Post()

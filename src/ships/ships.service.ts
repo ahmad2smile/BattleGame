@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Ship } from "./ship.entity";
 import { Repository } from "typeorm";
@@ -14,8 +14,14 @@ export class ShipsService {
 		private readonly shipRepository: Repository<Ship>,
 	) {}
 
-	find(id: number): Promise<Ship> {
-		return this.shipRepository.findOne(id);
+	async find(id: number): Promise<Ship> {
+		const ship = await this.shipRepository.findOne(id);
+
+		if (!ship) {
+			throw new NotFoundException("Ship not found");
+		}
+
+		return ship;
 	}
 
 	add(ship: Ship): Promise<Ship> {
