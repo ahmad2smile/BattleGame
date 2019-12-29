@@ -1,3 +1,5 @@
+import { GameStatus } from "./models/GameStatus";
+import { GameState } from "./models/GameState";
 import { Ship } from "./../ships/ship.entity";
 import { ShipsService } from "../ships/ships.service";
 import { Test, TestingModule } from "@nestjs/testing";
@@ -12,6 +14,7 @@ describe("GamesService", () => {
 	const game = new Game();
 	game.id = "1";
 	game.playerRole = PlayerRole.Attacker;
+	game.ships = [];
 
 	let mockRepository = {
 		findOne: () => game,
@@ -67,6 +70,29 @@ describe("GamesService", () => {
 			const savedGame = await gamesService.update(newGame);
 
 			expect(savedGame.playerRole).toBe(PlayerRole.Attacker);
+		});
+	});
+
+	describe("Game State", () => {
+		let gameState: GameState;
+		beforeAll(async () => {
+			gameState = await gamesService.state("1");
+		});
+
+		it("Should return the Game with id 1", async () => {
+			expect(gameState.id).toBe("1");
+		});
+
+		it("Should return the Sunk ships as 0", async () => {
+			expect(gameState.sunkShips).toBe(0);
+		});
+
+		it("Should return the Game Status as In Progress", async () => {
+			expect(gameState.gameStatus).toBe(GameStatus.InProgress);
+		});
+
+		it("Should return the active fleet as empty", async () => {
+			expect(gameState.activeFleet.length).toBe(0);
 		});
 	});
 });
