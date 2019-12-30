@@ -1,8 +1,16 @@
-import { Controller, Get, Query, Post, Body } from "@nestjs/common";
+import {
+	Controller,
+	Get,
+	Query,
+	Post,
+	Body,
+	Res,
+	HttpStatus,
+} from "@nestjs/common";
 import { AttacksService } from "./attacks.service";
 import { Attack } from "./attack.entity";
 import { AttackCreateDTO } from "./models/AttackCreateDTO";
-import { AttackDTO } from "./models/AttackDTO";
+import { Response } from "express";
 
 @Controller("attacks")
 export class AttacksController {
@@ -15,8 +23,11 @@ export class AttacksController {
 
 	@Post()
 	async createNewAttack(
-		@Body() attackDto: AttackCreateDTO,
-	): Promise<AttackDTO> {
-		return this._attacksService.add(attackDto);
+		@Res()
+		response: Response,
+		@Body()
+		attackDto: AttackCreateDTO,
+	) {
+		await this._attacksService.add(attackDto, response);
 	}
 }

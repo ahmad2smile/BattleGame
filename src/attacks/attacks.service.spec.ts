@@ -99,7 +99,7 @@ describe("AttacksService", () => {
 			attackCreateDto.gameId = "1";
 			attackCreateDto.position = 1;
 
-			attackResult = await service.add(attackCreateDto);
+			attackResult = await service.attack(attackCreateDto);
 		});
 
 		it("Should return the Attack with result MISS", () => {
@@ -115,7 +115,7 @@ describe("AttacksService", () => {
 			attackCreateDto.gameId = "1";
 			attackCreateDto.position = 100;
 
-			attackResult = await service.add(attackCreateDto);
+			attackResult = await service.attack(attackCreateDto);
 		});
 
 		it("Should return the Attack with result HIT at 100", () => {
@@ -127,7 +127,7 @@ describe("AttacksService", () => {
 			attackCreateDto.gameId = "1";
 			attackCreateDto.position = 99;
 
-			attackResult = await service.add(attackCreateDto);
+			attackResult = await service.attack(attackCreateDto);
 
 			expect(attackResult.result).toBe(AttackResult.Hit);
 		});
@@ -137,7 +137,7 @@ describe("AttacksService", () => {
 			attackCreateDto.gameId = "1";
 			attackCreateDto.position = 98;
 
-			attackResult = await service.add(attackCreateDto);
+			attackResult = await service.attack(attackCreateDto);
 
 			expect(attackResult.result).toBe(AttackResult.Hit);
 		});
@@ -147,7 +147,7 @@ describe("AttacksService", () => {
 			attackCreateDto.gameId = "1";
 			attackCreateDto.position = 97;
 
-			attackResult = await service.add(attackCreateDto);
+			attackResult = await service.attack(attackCreateDto);
 
 			expect(attackResult.result).toBe(
 				"Win!You have completed the game in 5 moves",

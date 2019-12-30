@@ -6,6 +6,7 @@ import {
 	Injectable,
 	BadRequestException,
 	NotFoundException,
+	HttpStatus,
 } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -15,6 +16,7 @@ import { AttackDTO } from "./models/AttackDTO";
 import { AttackResult } from "./models/AttackResult";
 import { Orientation } from "../ships/models/Orientation";
 import { PlayerRole } from "../games/models/PlayerRole";
+import { Response } from "express";
 
 @Injectable()
 export class AttacksService {
@@ -35,7 +37,48 @@ export class AttacksService {
 		return attack;
 	}
 
-	async add(attackDto: AttackCreateDTO): Promise<AttackDTO> {
+	queued: { attack: AttackCreateDTO; response: Response }[] = [];
+	inProgress: { attack: AttackCreateDTO; response: Response }[] = [];
+
+	async add(attack: AttackCreateDTO, response: Response) {
+		if (this.inProgress.some(a => a.attack.gameId === attack.gameId)) {
+			this.queued.push({ attack, response });
+		} else {
+			this.inProgress.unshift({ attack, response });
+
+			try {
+				const result = await this.attack(attack);
+
+				response.status(HttpStatus.CREATED).send(result);
+
+				this.inProgress = this.inProgress.filter(
+					a => a.attack.gameId !== attack.gameId,
+				);
+
+				await new Promise((resolve, reject) => {
+					setTimeout(async () => {
+						const firstQueued = this.queued.pop();
+
+						if (firstQueued) {
+							try {
+								await this.add(
+									firstQueued.attack,
+									firstQueued.response,
+								);
+								resolve();
+							} catch (error) {
+								reject(error);
+							}
+						}
+					}, 250);
+				});
+			} catch (error) {
+				response.status(HttpStatus.BAD_REQUEST).send(error);
+			}
+		}
+	}
+
+	async attack(attackDto: AttackCreateDTO): Promise<AttackDTO> {
 		const attack = new Attack();
 		attack.position = attackDto.position;
 

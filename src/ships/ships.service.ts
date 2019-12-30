@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Ship } from "./ship.entity";
-import { Repository } from "typeorm";
+import { Repository, UpdateResult } from "typeorm";
 import { ShipLength } from "./models/ShipLength";
 import { Orientation } from "./models/Orientation";
 import { ShipType } from "./models/ShipType";
@@ -30,6 +30,10 @@ export class ShipsService {
 	}
 
 	add(ship: Ship): Promise<Ship> {
+		return this.shipRepository.save(ship);
+	}
+
+	update(ship: Ship): Promise<Ship> {
 		return this.shipRepository.save(ship);
 	}
 
