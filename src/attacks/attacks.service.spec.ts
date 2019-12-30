@@ -99,7 +99,11 @@ describe("AttacksService", () => {
 			attackCreateDto.gameId = "1";
 			attackCreateDto.position = 1;
 
-			attackResult = await service.attack(attackCreateDto);
+			try {
+				attackResult = await service.attack(attackCreateDto);
+			} catch (error) {
+				console.log("TCL: error", error);
+			}
 		});
 
 		it("Should return the Attack with result MISS", () => {
