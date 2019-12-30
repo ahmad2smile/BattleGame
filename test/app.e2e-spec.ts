@@ -183,4 +183,13 @@ describe("AppController (e2e)", () => {
 
 		return done();
 	});
+
+	it("The Game has been WON!", async done => {
+		const response = await request.get(`/games?id=${game.id}`);
+
+		const status = response.body;
+		expect(status.gameStatus).toBe("Won");
+
+		return done();
+	});
 });
