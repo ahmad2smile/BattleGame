@@ -44,6 +44,39 @@ for details please check `ormconfig.json`
 
 ```
 
+## Endpoints
+
+New Game:
+
+```bash
+ /games (POST)
+
+ body= {
+     playerRole: "Atacker"
+ }
+```
+
+New Game:
+
+```bash
+ /place-ship (POST)
+
+ body={
+     gameId: "c12ea82a-3c87-4ec3-b977-577dc08ecbe3",
+     position: 31
+ }
+```
+
+State of the Game:
+
+```bash
+ /attacks (GET)
+
+ Query={
+     id: "c12ea82a-3c87-4ec3-b977-577dc08ecbe3"
+ }
+```
+
 ## Stay in touch
 
 -   Author - [Ahmad](http://shafiqahmad.com)
