@@ -16,8 +16,11 @@ import { AttackDTO } from "./models/AttackDTO";
 import { AttackResult } from "./models/AttackResult";
 import { Orientation } from "../ships/models/Orientation";
 import { PlayerRole } from "../games/models/PlayerRole";
-import { Response } from "express";
 
+export interface PromiseToResolve<T> {
+	resolve: (payload: T) => void;
+	reject: (payload: Error) => void;
+}
 @Injectable()
 export class AttacksService {
 	constructor(
@@ -37,25 +40,34 @@ export class AttacksService {
 		return attack;
 	}
 
-	queued: { attack: AttackCreateDTO; response: Response }[] = [];
-	inProgress: { attack: AttackCreateDTO; response: Response }[] = [];
+	queued: {
+		attack: AttackCreateDTO;
+		promiseToResolve: PromiseToResolve<AttackDTO>;
+	}[] = [];
+	inProgress: {
+		attack: AttackCreateDTO;
+		promiseToResolve: PromiseToResolve<AttackDTO>;
+	}[] = [];
 
-	async add(attack: AttackCreateDTO, response: Response) {
+	async add(
+		attack: AttackCreateDTO,
+		promiseToResolve: PromiseToResolve<AttackDTO>,
+	) {
 		if (this.inProgress.some(a => a.attack.gameId === attack.gameId)) {
-			this.queued.push({ attack, response });
+			this.queued.push({ attack, promiseToResolve });
 		} else {
-			this.inProgress.unshift({ attack, response });
+			this.inProgress.unshift({ attack, promiseToResolve });
 
 			try {
 				const result = await this.attack(attack);
 
-				response.status(HttpStatus.CREATED).send(result);
+				promiseToResolve.resolve(result);
 
 				this.inProgress = this.inProgress.filter(
 					a => a.attack.gameId !== attack.gameId,
 				);
 
-				await new Promise((resolve, reject) => {
+				await new Promise((promiseToResolve, reject) => {
 					setTimeout(async () => {
 						const firstQueued = this.queued.pop();
 
@@ -63,9 +75,9 @@ export class AttacksService {
 							try {
 								await this.add(
 									firstQueued.attack,
-									firstQueued.response,
+									firstQueued.promiseToResolve,
 								);
-								resolve();
+								promiseToResolve();
 							} catch (error) {
 								reject(error);
 							}
@@ -73,7 +85,7 @@ export class AttacksService {
 					}, 250);
 				});
 			} catch (error) {
-				response.status(HttpStatus.BAD_REQUEST).send(error);
+				promiseToResolve.reject(error);
 			}
 		}
 	}
