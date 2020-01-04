@@ -18,8 +18,12 @@ export class AttacksController {
 		@Body()
 		attackDto: AttackCreateDTO,
 	): Promise<AttackDTO> {
-		return new Promise<AttackDTO>((resolve, reject) =>
-			this._attacksService.add(attackDto, { resolve, reject }),
-		);
+		return new Promise<AttackDTO>(async (resolve, reject) => {
+			try {
+				await this._attacksService.add(attackDto, resolve, reject);
+			} catch (error) {
+				reject(error);
+			}
+		});
 	}
 }

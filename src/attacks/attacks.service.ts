@@ -6,7 +6,6 @@ import {
 	Injectable,
 	BadRequestException,
 	NotFoundException,
-	HttpStatus,
 } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -16,6 +15,7 @@ import { AttackDTO } from "./models/AttackDTO";
 import { AttackResult } from "./models/AttackResult";
 import { Orientation } from "../ships/models/Orientation";
 import { PlayerRole } from "../games/models/PlayerRole";
+import { Queue } from "../utils/queueDecorator";
 
 export interface PromiseToResolve<T> {
 	resolve: (payload: T) => void;
@@ -40,54 +40,15 @@ export class AttacksService {
 		return attack;
 	}
 
-	queued: {
-		attack: AttackCreateDTO;
-		promiseToResolve: PromiseToResolve<AttackDTO>;
-	}[] = [];
-	inProgress: {
-		attack: AttackCreateDTO;
-		promiseToResolve: PromiseToResolve<AttackDTO>;
-	}[] = [];
-
+	@Queue<AttacksService, AttackCreateDTO, AttackDTO>(
+		(a, b) => a.gameId === b.gameId,
+	)
 	async add(
 		attack: AttackCreateDTO,
-		promiseToResolve: PromiseToResolve<AttackDTO>,
-	) {
-		if (this.inProgress.some(a => a.attack.gameId === attack.gameId)) {
-			this.queued.push({ attack, promiseToResolve });
-		} else {
-			this.inProgress.unshift({ attack, promiseToResolve });
-
-			try {
-				const result = await this.attack(attack);
-
-				promiseToResolve.resolve(result);
-
-				this.inProgress = this.inProgress.filter(
-					a => a.attack.gameId !== attack.gameId,
-				);
-
-				await new Promise((promiseToResolve, reject) => {
-					setTimeout(async () => {
-						const firstQueued = this.queued.pop();
-
-						if (firstQueued) {
-							try {
-								await this.add(
-									firstQueued.attack,
-									firstQueued.promiseToResolve,
-								);
-								promiseToResolve();
-							} catch (error) {
-								reject(error);
-							}
-						}
-					}, 250);
-				});
-			} catch (error) {
-				promiseToResolve.reject(error);
-			}
-		}
+		resolve: (payload: AttackDTO) => void,
+		reject: (error: Error) => void,
+	): Promise<AttackDTO> {
+		return this.attack(attack);
 	}
 
 	async attack(attackDto: AttackCreateDTO): Promise<AttackDTO> {
