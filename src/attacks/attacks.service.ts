@@ -43,14 +43,6 @@ export class AttacksService {
 	@Queue<AttacksService, AttackCreateDTO, AttackDTO>(
 		(a, b) => a.gameId === b.gameId,
 	)
-	async add(
-		attack: AttackCreateDTO,
-		resolve: (payload: AttackDTO) => void,
-		reject: (error: Error) => void,
-	): Promise<AttackDTO> {
-		return this.attack(attack);
-	}
-
 	async attack(attackDto: AttackCreateDTO): Promise<AttackDTO> {
 		const attack = new Attack();
 		attack.position = attackDto.position;
