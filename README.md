@@ -56,7 +56,7 @@ New Game:
  }
 ```
 
-New Game:
+Place Ship on Game (playerRole should be "Defender"):
 
 ```bash
  /place-ship (POST)
@@ -67,10 +67,21 @@ New Game:
  }
 ```
 
+Attack at Game (player Role should be "Attacker"):
+
+```bash
+ /attacks (POST)
+
+  body={
+     gameId: "c12ea82a-3c87-4ec3-b977-577dc08ecbe3",
+     position: 31
+ }
+```
+
 State of the Game:
 
 ```bash
- /attacks (GET)
+ /games (GET)
 
  Query={
      id: "c12ea82a-3c87-4ec3-b977-577dc08ecbe3"
