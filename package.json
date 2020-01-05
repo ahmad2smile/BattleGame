@@ -32,6 +32,7 @@
     "class-validator": "^0.11.0",
     "express": "^4.17.1",
     "mysql": "^2.17.1",
+    "queue-decorator": "^1.0.3",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.3",

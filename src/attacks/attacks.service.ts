@@ -15,12 +15,10 @@ import { AttackDTO } from "./models/AttackDTO";
 import { AttackResult } from "./models/AttackResult";
 import { Orientation } from "../ships/models/Orientation";
 import { PlayerRole } from "../games/models/PlayerRole";
-import { Queue } from "../utils/queueDecorator";
+// move utils to package
+// https://github.com/ahmad2smile/queue-decorator
+import { Queue } from "queue-decorator";
 
-export interface PromiseToResolve<T> {
-	resolve: (payload: T) => void;
-	reject: (payload: Error) => void;
-}
 @Injectable()
 export class AttacksService {
 	constructor(
@@ -41,7 +39,7 @@ export class AttacksService {
 	}
 
 	@Queue<AttacksService, AttackCreateDTO, AttackDTO>(
-		(a, b) => a.gameId === b.gameId,
+		(a: AttackCreateDTO, b: AttackCreateDTO) => a.gameId === b.gameId,
 	)
 	async attack(attackDto: AttackCreateDTO): Promise<AttackDTO> {
 		const attack = new Attack();
